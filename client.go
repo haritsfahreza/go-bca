@@ -71,11 +71,7 @@ func (c *ClientImplementation) CallRaw(method, path, contentType string, headers
 		return err
 	}
 
-	if err := c.Do(req, v); err != nil {
-		return err
-	}
-
-	return nil
+	return c.Do(req, v)
 }
 
 //NewRequest is used to create new HTTP request of BCA API
