@@ -5,11 +5,30 @@
 [![MIT license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 [![Build Status](https://travis-ci.org/haritsfahreza/go-bca.svg?branch=master)](https://travis-ci.org/haritsfahreza/go-bca)
 
-Go(lang) library to speed up your BCA (Bank Central Asia) API integration process. See [this official documentation of BCA API](https://developer.bca.co.id/documentation/)
+Go(lang) library to speed up your BCA (Bank Central Asia) API integration process. See this [official documentation of BCA API](https://developer.bca.co.id/documentation/)
 
 ## Usage
 ```
-Under Construction
+import (
+	"context"
+
+	"github.com/haritsfahreza/go-bca"
+	"github.com/haritsfahreza/go-bca/business"
+)
+
+func main() {
+    client := business.NewClient(bca.Config{
+        ClientID:     "",
+        ClientSecret: "",
+        APIKey:       "",
+        APISecret:    "",
+        CorporateID:  "BCAAPI2016", //Based on API document
+        OriginHost:   "localhost",
+    })
+
+    ctx := context.Background()
+    response, err := client.GetBalanceInfo(ctx, []string{"0201245680", "0063001004"})
+}
 ```
 
 ## Example
