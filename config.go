@@ -6,6 +6,8 @@ type Config struct {
 	ClientSecret string
 	APIKey       string
 	APISecret    string
+	URL          string
 	CorporateID  string
 	OriginHost   string
+	LogLevel     int
 }

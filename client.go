@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -36,25 +37,26 @@ func NewClient(cfg Config) ClientImplementation {
 	return ClientImplementation{
 		APIKey:     cfg.APIKey,
 		APISecret:  cfg.APISecret,
+		URL:        cfg.URL,
 		OriginHost: cfg.OriginHost,
 		HTTPClient: &http.Client{Timeout: 60 * time.Second},
 		// 0: no logging
 		// 1: errors only
 		// 2: errors + informational (default)
 		// 3: errors + informational + debug
-		LogLevel: 2,
+		LogLevel: cfg.LogLevel,
 		Logger:   log.New(os.Stderr, "", log.LstdFlags),
 	}
 }
 
 //Call is the implementation for invoking BCA API with its authentication
 func (c *ClientImplementation) Call(method, path, accessToken string, body io.Reader, v interface{}) error {
-	var headers http.Header
+	headers := http.Header{}
 	headers.Add("Authorization", "Bearer "+accessToken)
 	headers.Add("Origin", c.OriginHost)
 	headers.Add("X-BCA-Key", c.APIKey)
 
-	timestamp := time.Now().Format(time.RFC3339)
+	timestamp := time.Now().Format("2006-01-02T15:04:05.999Z07:00")
 	headers.Add("X-BCA-Timestamp", timestamp)
 
 	buf := new(bytes.Buffer)
@@ -145,7 +147,7 @@ func (c *ClientImplementation) Do(req *http.Request, v interface{}) error {
 	}
 
 	if logLevel > 2 {
-		logger.Println("BCA response: ", resBody)
+		logger.Println("BCA response: ", string(resBody))
 	}
 
 	if v != nil {
@@ -160,9 +162,9 @@ func (c *ClientImplementation) Do(req *http.Request, v interface{}) error {
 func generateSignature(apiSecret, method, path, accessToken, requestBody, timestamp string) string {
 	h := sha256.New()
 	h.Write([]byte(requestBody))
-	strToSign := method + ":" + path + ":" + accessToken + ":" + strings.ToLower(string(h.Sum(nil))) + ":" + timestamp
+	strToSign := method + ":" + path + ":" + accessToken + ":" + hex.EncodeToString(h.Sum(nil)) + ":" + timestamp
 
 	mac := hmac.New(sha256.New, []byte(apiSecret))
 	mac.Write([]byte(strToSign))
-	return string(mac.Sum(nil))
+	return hex.EncodeToString(mac.Sum(nil))
 }
