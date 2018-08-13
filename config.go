@@ -5,6 +5,7 @@ type Config struct {
 	ClientID     string
 	ClientSecret string
 	APIKey       string
+	APISecret    string
 	CorporateID  string
 	OriginHost   string
 }
