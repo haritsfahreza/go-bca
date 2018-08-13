@@ -31,7 +31,7 @@ func NewClient(config bca.Config) Client {
 func (c Client) GetBalanceInfo(ctx context.Context, accountNumbers []string) (bca.BalanceInfoResponse, error) {
 	var response bca.BalanceInfoResponse
 	path := fmt.Sprintf("/banking/v3/corporates/%s/accounts/%s", c.CorporateID, strings.Join(accountNumbers, ","))
-	if err := c.Client.Call("GET", path, c.AccessToken, bytes.NewBufferString(""), response); err != nil {
+	if err := c.Client.Call("GET", path, c.AccessToken, bytes.NewBufferString(""), &response); err != nil {
 		return response, err
 	}
 	return response, nil
@@ -47,7 +47,7 @@ func (c Client) GetAccountStatement(ctx context.Context, accountNumber string, s
 	v.Add("EndDate", endDate.Format("2006-01-02"))
 	path += "?" + v.Encode()
 
-	if err := c.Client.Call("GET", path, c.AccessToken, bytes.NewBufferString(""), response); err != nil {
+	if err := c.Client.Call("GET", path, c.AccessToken, bytes.NewBufferString(""), &response); err != nil {
 		return response, err
 	}
 	return response, nil
@@ -63,7 +63,7 @@ func (c Client) FundTransfer(ctx context.Context, request bca.FundTransferReques
 	}
 
 	path := "/banking/corporates/transfers"
-	if err := c.Client.Call("POST", path, c.AccessToken, bytes.NewBuffer(jsonReq), response); err != nil {
+	if err := c.Client.Call("POST", path, c.AccessToken, bytes.NewBuffer(jsonReq), &response); err != nil {
 		return response, err
 	}
 	return response, nil

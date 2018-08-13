@@ -8,19 +8,20 @@ import (
 type AccountBalance struct {
 	AccountNumber    string
 	Currency         string  `json:",omitempty"`
-	Balance          float64 `json:",omitempty"`
-	AvailableBalance float64 `json:",omitempty"`
-	FloatAmount      float64 `json:",omitempty"`
-	HoldAmount       float64 `json:",omitempty"`
-	Plafon           float64 `json:",omitempty"`
+	Balance          float64 `json:",string"`
+	AvailableBalance float64 `json:",string"`
+	FloatAmount      float64 `json:",string"`
+	HoldAmount       float64 `json:",string"`
+	Plafon           float64 `json:",string"`
 	Indonesian       string  `json:",omitempty"`
 	English          string  `json:",omitempty"`
 }
 
 //BalanceInfoResponse represents account balance information response message
 type BalanceInfoResponse struct {
-	AccountDetailDataSuccess *[]AccountBalance `json:",omitempty"`
-	AccountDetailDataFailed  *[]AccountBalance `json:",omitempty"`
+	Error
+	AccountDetailDataSuccess []AccountBalance `json:",omitempty"`
+	AccountDetailDataFailed  []AccountBalance `json:",omitempty"`
 }
 
 //AccountStatement represents account statement information
@@ -28,17 +29,18 @@ type AccountStatement struct {
 	TransactionDate   string
 	BranchCode        string
 	TransactionType   string
-	TransactionAmount float64
+	TransactionAmount float64 `json:",string"`
 	TransactionName   string
 	Trailer           string
 }
 
 //AccountStatementResponse represents account statement response message
 type AccountStatementResponse struct {
-	StartDate    time.Time
-	EndDate      time.Time
+	Error
+	StartDate    time.Time `json:",string"`
+	EndDate      time.Time `json:",string"`
 	Currency     string
-	StartBalance float64
+	StartBalance float64 `json:",string"`
 	Data         []AccountStatement
 }
 
@@ -50,7 +52,7 @@ type FundTransferRequest struct {
 	TransactionDate          string
 	ReferenceID              string
 	CurrencyCode             string
-	Amount                   float64
+	Amount                   float64 `json:",string"`
 	BeneficiaryAccountNumber string
 	Remark1                  string
 	Remark2                  string
@@ -58,6 +60,7 @@ type FundTransferRequest struct {
 
 //FundTransferResponse represents fund transfer response message
 type FundTransferResponse struct {
+	Error
 	TransactionID   string
 	TransactionDate string
 	ReferenceID     string
