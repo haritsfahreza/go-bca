@@ -23,6 +23,7 @@ type Client interface {
 //ClientImplementation represents config that used for HTTP client needs
 type ClientImplementation struct {
 	APIKey     string
+	APISecret  string
 	OriginHost string
 	URL        string
 	HTTPClient *http.Client
@@ -34,6 +35,7 @@ type ClientImplementation struct {
 func NewClient(cfg Config) ClientImplementation {
 	return ClientImplementation{
 		APIKey:     cfg.APIKey,
+		APISecret:  cfg.APISecret,
 		OriginHost: cfg.OriginHost,
 		HTTPClient: &http.Client{Timeout: 60 * time.Second},
 		// 0: no logging
@@ -57,7 +59,7 @@ func (c *ClientImplementation) Call(method, path, accessToken string, body io.Re
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(body)
-	signature := generateSignature(c.APIKey, method, path, accessToken, buf.String(), timestamp)
+	signature := generateSignature(c.APISecret, method, path, accessToken, buf.String(), timestamp)
 	headers.Add("X-BCA-Signature", signature)
 
 	return c.CallRaw(method, path, "application/json", headers, body, v)
