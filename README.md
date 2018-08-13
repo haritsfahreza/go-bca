@@ -17,14 +17,25 @@ import (
 )
 
 func main() {
-    client := business.NewClient(bca.Config{
-        ClientID:     "",
-        ClientSecret: "",
-        APIKey:       "",
-        APISecret:    "",
-        CorporateID:  "BCAAPI2016", //Based on API document
-        OriginHost:   "localhost",
-    })
+    cfg := bca.Config{
+		URL:          "https://sandbox.bca.co.id",
+		ClientID:     "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+		ClientSecret: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+		APIKey:       "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+		APISecret:    "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+		CorporateID:  "BCAAPI2016", //Based on API document
+		OriginHost:   "localhost",
+	}
+	businessClient := business.NewClient(cfg)
+	authClient := auth.NewClient(cfg)
+
+	ctx := context.Background()
+	authToken, err := authClient.GetToken(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+    businessClient.AccessToken = authToken.AccessToken
 
     ctx := context.Background()
     response, err := client.GetBalanceInfo(ctx, []string{"0201245680", "0063001004"})
