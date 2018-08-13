@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -40,6 +41,12 @@ func (c Client) GetBalanceInfo(ctx context.Context, accountNumbers []string) (bc
 func (c Client) GetAccountStatement(ctx context.Context, accountNumber string, startDate, endDate time.Time) (bca.AccountStatementResponse, error) {
 	var response bca.AccountStatementResponse
 	path := fmt.Sprintf("/banking/v3/corporates/%s/accounts/%s/statements", c.CorporateID, accountNumber)
+
+	v := url.Values{}
+	v.Add("StartDate", startDate.Format("2006-01-02"))
+	v.Add("EndDate", endDate.Format("2006-01-02"))
+	path += "?" + v.Encode()
+
 	if err := c.Client.Call("GET", path, c.AccessToken, bytes.NewBufferString(""), response); err != nil {
 		return response, err
 	}
