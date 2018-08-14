@@ -1,4 +1,4 @@
-package example
+package main
 
 import (
 	"context"
@@ -7,37 +7,49 @@ import (
 	"time"
 
 	"github.com/haritsfahreza/go-bca"
+	"github.com/haritsfahreza/go-bca/auth"
 	"github.com/haritsfahreza/go-bca/business"
 )
 
 func main() {
-	client := business.NewClient(bca.Config{
+	cfg := bca.Config{
+		URL:          "https://sandbox.bca.co.id",
 		ClientID:     "",
 		ClientSecret: "",
 		APIKey:       "",
 		APISecret:    "",
 		CorporateID:  "BCAAPI2016", //Based on API document
 		OriginHost:   "localhost",
-	})
+		LogLevel:     3,
+	}
+	businessClient := business.NewClient(cfg)
+	authClient := auth.NewClient(cfg)
 
 	ctx := context.Background()
-	getBalanceInfo(ctx, client)
-	getAccountStatement(ctx, client)
-	fundTransfer(ctx, client)
-}
-
-func getBalanceInfo(ctx context.Context, client business.Client) {
-	response, err := client.GetBalanceInfo(ctx, []string{"0201245680", "0063001004"})
+	authToken, err := authClient.GetToken(ctx)
 	if err != nil {
 		panic(err)
 	}
-	if len(*response.AccountDetailDataFailed) > 0 {
-		for i, account := range *response.AccountDetailDataFailed {
+
+	businessClient.AccessToken = authToken.AccessToken
+
+	getBalanceInfo(ctx, businessClient)
+	getAccountStatement(ctx, businessClient)
+	fundTransfer(ctx, businessClient)
+}
+
+func getBalanceInfo(ctx context.Context, client business.Client) {
+	response, err := client.GetBalanceInfo(ctx, []string{"0201245680"})
+	if err != nil {
+		panic(err)
+	}
+	if len(response.AccountDetailDataFailed) > 0 {
+		for i, account := range response.AccountDetailDataFailed {
 			fmt.Printf("%d - Error: %s - %s", i, account.English, account.Indonesian)
 		}
 		return
 	}
-	for i, account := range *response.AccountDetailDataSuccess {
+	for i, account := range response.AccountDetailDataSuccess {
 		jsonStr, _ := json.Marshal(account)
 		fmt.Printf("%d - Account: %s", i, jsonStr)
 	}

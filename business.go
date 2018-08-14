@@ -1,9 +1,5 @@
 package bca
 
-import (
-	"time"
-)
-
 //AccountBalance represents account balance information
 type AccountBalance struct {
 	AccountNumber    string
@@ -37,8 +33,8 @@ type AccountStatement struct {
 //AccountStatementResponse represents account statement response message
 type AccountStatementResponse struct {
 	Error
-	StartDate    time.Time `json:",string"`
-	EndDate      time.Time `json:",string"`
+	StartDate    string
+	EndDate      string
 	Currency     string
 	StartBalance float64 `json:",string"`
 	Data         []AccountStatement
